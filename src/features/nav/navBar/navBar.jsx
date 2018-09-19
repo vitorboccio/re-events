@@ -27,7 +27,7 @@ import SignedOutMenu from '../menu/signedOutMenu';
             <Menu inverted fixed="top">
                 <Container>
                     <Menu.Item as={Link} to="/" header>
-                        <img src="assets/logo.png" alt="logo" />
+                        <img src="/assets/logo.png" alt="logo" />
                         Re-vents
                     </Menu.Item>
                     { authenticated && <Menu.Item as={NavLink} to='/events' name="Events" /> }    

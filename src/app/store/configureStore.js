@@ -1,4 +1,5 @@
 import { createStore, applyMiddleware, compose } from 'redux'
+import rootReducer from '../reducer/rootReducer'
 
 export const ConfigureStore = (preLoadedState) => {
     const middlewares = [];

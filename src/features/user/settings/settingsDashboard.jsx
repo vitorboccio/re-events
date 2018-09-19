@@ -1,6 +1,6 @@
 import React from 'react'
 import { Switch, Route, Redirect } from 'react-router-dom'
-import { Grid,  } from 'semantic-ui-react';
+import { Grid } from 'semantic-ui-react';
 import SettingsNav from './settingsNav';
 import BasicPage from './basicPage';
 import AboutPage from './aboutPage'

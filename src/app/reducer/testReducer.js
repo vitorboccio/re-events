@@ -1,4 +1,4 @@
-const initial = {
+const initialState = {
     data: 42
 }
 

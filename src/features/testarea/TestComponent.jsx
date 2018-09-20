@@ -1,19 +1,29 @@
 import React, { Component } from 'react'
+import { Button } from 'semantic-ui-react'
 import { connect } from 'react-redux'
+import { incrementCounter, decrementCounter } from './testActions'
 
 const mapState = (state) => ({
     data: state.test.data
 })
 
+const actions = {
+    incrementCounter,
+    decrementCounter
+}
+
 class TestComponent extends Component {
   render() {
+    const {incrementCounter, decrementCounter, data} = this.props
     return (
         <div>
             <h1>test area</h1>
-            <h3>the answer is : {this.props.data}</h3>
+            <h3>the answer is : {data}</h3>
+            <Button onClick={incrementCounter} color="green" content="increment" />
+            <Button onClick={decrementCounter} color="blue" content="decrement" />
         </div>
     )
   }
 }
 
-export default connect(mapState)(TestComponent)
+export default connect(mapState, actions)(TestComponent)

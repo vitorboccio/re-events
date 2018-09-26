@@ -3,10 +3,11 @@ import ReactDOM from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux'
 import 'semantic-ui-css/semantic.min.css';
+import ScrollToTop from './app/common/util/ScrollToTop'
 import './index.css';
 import App from './app/layout/App';
 import registerServiceWorker from './registerServiceWorker';
-import ConfigureStore from './app/store/configureStore'
+import ConfigureStore from './app/store/configureStore';
 
 const store = ConfigureStore();
 
@@ -16,7 +17,9 @@ let render = () => {
     ReactDOM.render(
         <Provider store={store}>
             <BrowserRouter>
-                <App />    
+                <ScrollToTop>
+                    <App />
+                </ScrollToTop>
             </BrowserRouter> 
         </Provider>,
         rootEl

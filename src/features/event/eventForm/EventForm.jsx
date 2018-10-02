@@ -64,12 +64,11 @@ class EventForm extends Component {
 
   render() {
 
-    const {handleCancel} = this.props;
     const {event} = this.state;
     return (
       <Segment>
         <Form onSubmit={this.onFormSubmit}>
-          <Field name="title" type="text" component="input" placeholder="event title" />
+          <Field name="title" type="text" component={TextInput} placeholder="event title" />
           <Form.Field>
             <label>Event Date</label>
             <input name='date' onChange={this.onInputChange} value={event.date} type="date" placeholder="Event Date" />

@@ -1,37 +1,34 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Field, reduxForm } from 'redux-form'
+import { reduxForm, Field } from 'redux-form';
+import moment from 'moment';
 import cuid from 'cuid';
 import { Segment, Form, Button, Grid, Header } from 'semantic-ui-react';
-import { createEvent, updateEvent } from '../eventActions'
-import TextInput from '../../../app/common/form/TextInput'
-import TextArea from '../../../app/common/form/TextArea'
+import { composeValidators, combineValidators, isRequired, hasLengthGreaterThan } from 'revalidate'
+import { createEvent, updateEvent } from '../eventActions';
+import TextInput from '../../../app/common/form/TextInput';
+import TextArea from '../../../app/common/form/TextArea';
 import SelectInput from '../../../app/common/form/SelectInput';
+import DateInput from '../../../app/common/form/DateInput';
 
 const mapState = (state, ownProps) => {
   const eventId = ownProps.match.params.id;
 
-  let event = {
-    title: '',
-    date: '',
-    city: '',
-    venue: '',
-    hostedBy: ''
-  }
+  let event = {};
 
   if (eventId && state.events.length > 0) {
-    event = state.events.filter(event => event.id === eventId)[0]
+    event = state.events.filter(event => event.id === eventId)[0];
   }
 
   return {
-    event
-  }
-}
+    initialValues: event
+  };
+};
 
 const actions = {
   createEvent,
   updateEvent
-}
+};
 
 const category = [
     {key: 'drinks', text: 'Drinks', value: 'drinks'},
@@ -42,51 +39,101 @@ const category = [
     {key: 'travel', text: 'Travel', value: 'travel'},
 ];
 
+const validate = combineValidators({
+  title: isRequired({message: 'The event title is required'}),
+  category: isRequired({message: 'Please provide a category'}),
+  description: composeValidators(
+    isRequired({message: 'Please enter a description'}),
+    hasLengthGreaterThan(4)({message: 'Description needs to be at least 5 characters'})
+  )(),
+  city: isRequired('city'),
+  venue: isRequired('venue'),
+  date: isRequired('date')
+})
+
 class EventForm extends Component {
 
-  onFormSubmit = (evt) => {
-    evt.preventDefault();
-    if (this.state.event.id) {
-      this.props.updateEvent(this.state.event);
+  onFormSubmit = values => {
+    values.date = moment(values.date).format()
+    if (this.props.initialValues.id) {
+      this.props.updateEvent(values);
       this.props.history.goBack();
     } else {
       const newEvent = {
-        ...this.state.event,
+        ...values,
         id: cuid(),
-        hostPhotoURL: '/assets/user.png'
-      }
-      this.props.createEvent(newEvent)
-      this.props.history.push('/events')
+        hostPhotoURL: '/assets/user.png',
+        hostedBy: 'Bob'
+      };
+      this.props.createEvent(newEvent);
+      this.props.history.push('/events');
     }
-
-  }
+  };
 
   render() {
-
+    const {invalid, submitting, pristine} = this.props;
     return (
       <Grid>
         <Grid.Column width={10}>
           <Segment>
-            <Header sub color="teal" content="Event Detailed"/>
-            <Form onSubmit={this.onFormSubmit}>
-              <Field name="title" type="text" component={TextInput} placeholder="Event title" />
-              <Field name="Category" options={category} multiple={true} type="text" component={SelectInput} placeholder="What is your event about ?" />
-              <Field name="Description" type="text" component={TextArea} rows={3} placeholder="Tell us about your event" />
-              <Header sub color="teal" content="Event location details" />
-              <Field name="City" type="text" component={TextInput} placeholder="Event City" />
-              <Field name="Venue" type="text" component={TextInput} placeholder="Event Venue" />
-              <Field name="Date" type="text" component={TextInput} placeholder="Event Date" />
-              <Button positive type="submit">
+            <Header sub color='teal' content='Event Details'/>
+            <Form onSubmit={this.props.handleSubmit(this.onFormSubmit)}>
+              <Field
+                name="title"
+                type="text"
+                component={TextInput}
+                placeholder="Give your event a name"
+              />
+              <Field
+                name="category"
+                type="text"
+                component={SelectInput}
+                options={category}
+                placeholder="What is your event about"
+              />
+              <Field
+                name="description"
+                type="text"
+                component={TextArea}
+                rows={3}
+                placeholder="Tell us about your event"
+              />
+              <Header sub color='teal' content='Event Location details'/>
+              <Field
+                name="city"
+                type="text"
+                component={TextInput}
+                placeholder="Event city"
+              />
+              <Field
+                name="venue"
+                type="text"
+                component={TextInput}
+                placeholder="Event venue"
+              />
+              <Field
+                name="date"
+                type="text"
+                component={DateInput}
+                dateFormat='YYYY-MM-DD HH:mm'
+                timeFormat='HH:mm'
+                showTimeSelect
+                placeholder="Date and time of event"
+              />
+              <Button disabled={invalid || submitting || pristine} positive type="submit">
                 Submit
               </Button>
-              <Button onClick={this.props.history.goBack} type="button">Cancel</Button>
+              <Button onClick={this.props.history.goBack} type="button">
+                Cancel
+              </Button>
             </Form>
-          </Segment>  
+          </Segment>
         </Grid.Column>
       </Grid>
-      
     );
   }
 }
 
-export default connect(mapState, actions)(reduxForm({form: 'eventForm'})(EventForm));
+export default connect(mapState, actions)(
+  reduxForm({ form: 'eventForm', enableReinitialize: true, validate })(EventForm)
+);

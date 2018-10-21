@@ -71,11 +71,26 @@ class EventForm extends Component {
       this.setState({
         cityLatLng: latlng
       })
+    }).then(() => {
+      this.props.change('city', selectedCity)
+    })
+  }
+
+  handleVenueSelect = selectedVenue => {
+    geocodeByAddress(selectedVenue)
+    .then(results => getLatLng(results[0]))
+    .then(latlng => {
+      this.setState({
+        VenueLatLng: latlng
+      })
+    }).then(() => {
+      this.props.change('venue', selectedVenue)
     })
   }
 
   onFormSubmit = values => {
     values.date = moment(values.date).format()
+    values.venueLatLng = this.state.venueLatLng;
     if (this.props.initialValues.id) {
       this.props.updateEvent(values);
       this.props.history.goBack();
@@ -96,8 +111,8 @@ class EventForm extends Component {
     return (
       <Grid>
         <Script
-          url="https://maps.googleapis.com/maps/api/js?key=AIzaSyBftBmszB5z7wns6db-g412NN-OhozUnsU&libraries=places&language=en-US"
-          onLoad={this.handleScriptLoad}
+        url="https://maps.googleapis.com/maps/api/js?key=AIzaSyBftBmszB5z7wns6db-g412NN-OhozUnsU&libraries=places&language=en-US"
+        onLoad={this.handleScriptLoad}
         />
         <Grid.Column width={10}>
           <Segment>
@@ -141,6 +156,7 @@ class EventForm extends Component {
                   types: ['establishment']}}
                 component={PlaceInput}
                 placeholder="Event venue"
+                onSelect={this.handleVenueSelect}
               />
               <Field
                 name="date"
